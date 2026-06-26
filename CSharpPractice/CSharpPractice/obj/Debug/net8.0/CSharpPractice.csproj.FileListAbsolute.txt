@@ -1,0 +1,15 @@
+C:\Users\User\Desktop\.Net-Core\CSharpPractice\CSharpPractice\bin\Debug\net8.0\CSharpPractice.exe
+C:\Users\User\Desktop\.Net-Core\CSharpPractice\CSharpPractice\bin\Debug\net8.0\CSharpPractice.deps.json
+C:\Users\User\Desktop\.Net-Core\CSharpPractice\CSharpPractice\bin\Debug\net8.0\CSharpPractice.runtimeconfig.json
+C:\Users\User\Desktop\.Net-Core\CSharpPractice\CSharpPractice\bin\Debug\net8.0\CSharpPractice.dll
+C:\Users\User\Desktop\.Net-Core\CSharpPractice\CSharpPractice\bin\Debug\net8.0\CSharpPractice.pdb
+C:\Users\User\Desktop\.Net-Core\CSharpPractice\CSharpPractice\obj\Debug\net8.0\CSharpPractice.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\Desktop\.Net-Core\CSharpPractice\CSharpPractice\obj\Debug\net8.0\CSharpPractice.AssemblyInfoInputs.cache
+C:\Users\User\Desktop\.Net-Core\CSharpPractice\CSharpPractice\obj\Debug\net8.0\CSharpPractice.AssemblyInfo.cs
+C:\Users\User\Desktop\.Net-Core\CSharpPractice\CSharpPractice\obj\Debug\net8.0\CSharpPractice.csproj.CoreCompileInputs.cache
+C:\Users\User\Desktop\.Net-Core\CSharpPractice\CSharpPractice\obj\Debug\net8.0\CSharpPractice.sourcelink.json
+C:\Users\User\Desktop\.Net-Core\CSharpPractice\CSharpPractice\obj\Debug\net8.0\CSharpPractice.dll
+C:\Users\User\Desktop\.Net-Core\CSharpPractice\CSharpPractice\obj\Debug\net8.0\refint\CSharpPractice.dll
+C:\Users\User\Desktop\.Net-Core\CSharpPractice\CSharpPractice\obj\Debug\net8.0\CSharpPractice.pdb
+C:\Users\User\Desktop\.Net-Core\CSharpPractice\CSharpPractice\obj\Debug\net8.0\CSharpPractice.genruntimeconfig.cache
+C:\Users\User\Desktop\.Net-Core\CSharpPractice\CSharpPractice\obj\Debug\net8.0\ref\CSharpPractice.dll
