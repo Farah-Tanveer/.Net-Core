@@ -8,4 +8,7 @@ Console.Write($"Age: {age}\n");
 Console.Write($"GPA: {gpa} \n");
 Console.Write($"isStudent: {isStudent} \n");
 
-Console.WriteLine("Hello, World!");
+Console.Write("Enter your name: ");
+string n = Console.ReadLine();
+Console.Write($"Hello {n} , Welcome to C#!");
+
