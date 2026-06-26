@@ -10,5 +10,10 @@ Console.Write($"isStudent: {isStudent} \n");
 
 Console.Write("Enter your name: ");
 string n = Console.ReadLine();
-Console.Write($"Hello {n} , Welcome to C#!");
+Console.Write($"Hello {n} , Welcome to C#!\n");
 
+Console.Write("\nEnter your name: ");
+string N = Console.ReadLine();
+Console.Write("Enter your age: ");
+int a = int.Parse(Console.ReadLine());
+Console.Write($"Hello {N}, You are {a} years old");
