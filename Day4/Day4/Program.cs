@@ -1,5 +1,5 @@
 ﻿// Exercise 1: print numbers 1-10, even numbers only
-for(int i=0;i<=10; i++)
+for(int i=1;i<=10; i++)
 {
     if (i % 2 == 0)
     {
@@ -19,17 +19,21 @@ while (true)
     }
     sum += number;
 }
-Console.WriteLine($"Sum of all numbers: ");
+Console.WriteLine("Sum of all numbers: " + sum);
 
 // Exercise 3: FizzBuzz — 1 to 50
 //   divisible by 3 → "Fizz"
 //   divisible by 5 → "Buzz"  
 //   divisible by both → "FizzBuzz"
 //   otherwise → just the number
-for(int i = 1; i <= 50; i++)
+for (int i = 1; i <= 50; i++)
 {
-    if (i % 3 == 0)
+    if (i % 3 == 0 && i % 5 == 0)
+        Console.WriteLine("FizzBuzz");
+    else if (i % 3 == 0)
         Console.WriteLine("Fizz");
     else if (i % 5 == 0)
         Console.WriteLine("Buzz");
+    else
+        Console.WriteLine("Just a number " + i);
 }
