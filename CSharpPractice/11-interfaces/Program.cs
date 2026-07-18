@@ -1,6 +1,7 @@
 ﻿// What an interface is:
 //An interface is a contract. It says "any class that implements me MUST have these methods."
 //It has no code inside — just method signatures. Think of it as abstract class but even stricter, and a class can implement multiple interfaces unlike inheritance.
+//A class can have many interfaces and is more stricter than abstract classes.
 // Define the contract
 
 Dog d = new Dog("Max");
