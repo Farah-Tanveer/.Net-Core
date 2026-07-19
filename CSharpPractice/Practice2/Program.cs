@@ -179,7 +179,7 @@ for (int i = 1; i <= 2 * term; i++)
     }
 
 }
-Console.WriteLine($"The Sum of odd Natural Number upto {term} terms :{sum}");
+Console.WriteLine($"The Sum of odd Natural Number upto {term} terms :{sum2}");
 
 //Write a C# Sharp program to accept a coordinate point in an XY coordinate system and determine in which quadrant the coordinate point lies.
 //Test Data :
