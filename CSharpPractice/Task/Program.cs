@@ -1,8 +1,11 @@
 ﻿//Console App
-using System.Diagnostics;
+using Microsoft.Data.SqlClient;
+string connectionString =
+    "Server=FARAH-TANVEER;Database=StudentManagementDB;Trusted_Connection=True;TrustServerCertificate=True;";
+
+
 
 List<Student> students = new List<Student>();
-int roll = 1;
 bool running = true;
 
 while (running)
@@ -61,7 +64,15 @@ void AddStudent()
     Console.Write("Enter section: ");
     string section = Console.ReadLine();
 
-    string[] subjects = { "Math", "Physics", "Chemistry", "English", "Computer" };
+    string[] subjects =
+    {
+        "Math",
+        "Physics",
+        "Chemistry",
+        "English",
+        "Computer"
+    };
+
     double[] grades = new double[subjects.Length];
 
     Console.WriteLine("\nEnter grades for each subject (0-100):");
@@ -70,25 +81,82 @@ void AddStudent()
     {
         grades[i] = GetValidGrade(subjects[i]);
     }
-    Student student = new Student(roll++, name, studentClass, section, subjects, grades);
-    students.Add(student);
 
-    Console.WriteLine($"\nStudent {name} added. Roll Number: {student.RollNumber}");
+    // Insert student into Students table
+    string studentQuery = @"
+        INSERT INTO Students (Name, Class, Section)
+        OUTPUT INSERTED.StudentId
+        VALUES (@Name, @Class, @Section);
+    ";
+
+    int studentId;
+
+    using (SqlConnection connection = new SqlConnection(connectionString))
+    using (SqlCommand command = new SqlCommand(studentQuery, connection))
+    {
+        command.Parameters.AddWithValue("@Name", name);
+        command.Parameters.AddWithValue("@Class", studentClass);
+        command.Parameters.AddWithValue("@Section", section);
+
+        connection.Open();
+
+        studentId = (int)command.ExecuteScalar();
+    }
+
+    // Insert grades into StudentGrades table
+    string gradeQuery = @"
+        INSERT INTO StudentGrades (StudentId, SubjectId, Grade)
+        VALUES (@StudentId, @SubjectId, @Grade);
+    ";
+
+    using (SqlConnection connection = new SqlConnection(connectionString))
+    using (SqlCommand command = new SqlCommand(gradeQuery, connection))
+    {
+        connection.Open();
+
+        for (int i = 0; i < subjects.Length; i++)
+        {
+            command.Parameters.Clear();
+
+            command.Parameters.AddWithValue("@StudentId", studentId);
+            command.Parameters.AddWithValue("@SubjectId", i + 1);
+            command.Parameters.AddWithValue("@Grade", grades[i]);
+
+            command.ExecuteNonQuery();
+        }
+    }
+
+    Console.WriteLine($"\nStudent {name} added. Student ID: {studentId}");
 }
 void DisplayAllStudents()
 {
+    string query = "SELECT * FROM Students";
 
-    if (students.Count == 0)
+    using SqlConnection connection = new SqlConnection(connectionString);
+    using SqlCommand command = new SqlCommand(query, connection);
+
+    connection.Open();
+
+    using SqlDataReader reader = command.ExecuteReader();
+
+    bool found = false;
+
+    while (reader.Read())
+    {
+        found = true;
+        Console.WriteLine("\n-----------------------");
+        Console.WriteLine($"Student ID : {reader["StudentId"]}");
+        Console.WriteLine($"Name       :{reader["Name"]}");
+        Console.WriteLine($"Class      : {reader["Class"]}");
+        Console.WriteLine($"Section    : {reader["Section"]}");
+    }
+
+    if (!found)
     {
         Console.WriteLine("No students found.");
-        return;
-    }
-
-    foreach (Student s in students)
-    {
-        s.DisplayInfo();
     }
 }
+
 
 void SearchStudentByName()
 {
@@ -137,7 +205,7 @@ void GenerateReport()
 
         classTotal += avg;
 
-        Console.WriteLine($"{s.RollNumber}         {s.Name}         {avg:F2}         {grade}       {status}");
+        Console.WriteLine($"{s.Name}         {avg:F2}         {grade}       {status}");
     }
 
     Console.WriteLine(new string('-', 58));
@@ -165,66 +233,4 @@ double GetValidGrade(string subjectName)
     } while (!valid);
 
     return grade;
-}
-class Student
-{
-    public string Name { get; set; }
-    public int RollNumber { get; set; }
-
-    public string Class { get; set; }
-    public string Section { get; set; }
-    public double[] Grades { get; private set; }
-
-    public string[] Subject { get; private set; }
-
-    public Student(int rollNumber, string name, string Sclass, string section, string[] subject, double[] grades)
-    {
-        RollNumber = rollNumber;
-        Name = name;
-        Class = Sclass;
-        Section = section;
-        Grades = grades;
-        Subject = subject;
-
-    }
-    public double CalculateAverage()
-    {
-        if (Grades.Length == 0) return 0;
-        double sum = 0;
-        foreach (var grade in Grades)
-        {
-            sum += grade;
-        }
-        return sum / Grades.Length;
-    }
-
-    public string GetLetterGrade()
-    {
-
-        double avg = CalculateAverage();
-        if (avg < 0 || avg > 100) return "Invalid Grade";
-        if (avg >= 90 && avg <= 100) return "A";
-        if (avg >= 80 && avg < 90) return "B";
-        if (avg >= 70 && avg < 80) return "C";
-        if (avg >= 40 && avg < 70) return "D";
-        return "F";
-    }
-
-    public bool HasPassed()
-    {
-        return CalculateAverage() >= 40;
-    }
-    public void DisplayInfo()
-    {
-        Console.WriteLine($"\nRoll Number : {RollNumber}");
-        Console.WriteLine($"Name        : {Name}");
-        Console.WriteLine($"Class       : {Class} - {Section}");
-        Console.WriteLine($"Average     : {CalculateAverage():F2}");
-        Console.WriteLine($"Grade       : {GetLetterGrade()}");
-        Console.WriteLine($"Status      : {(HasPassed() ? "PASS" : "FAIL")}");
-
-        Console.WriteLine("Subject Grades:");
-        for (int i = 0; i < Subject.Length; i++)
-            Console.WriteLine($"  {Subject[i],-12}: {Grades[i]}");
-    }
 }
