@@ -17,6 +17,23 @@
         Subject = subject;
 
     }
+    public void AddGrade(string subject, double grade)
+    {
+        string[] newSubjects = new string[Subject.Length + 1];
+        double[] newGrades = new double[Grades.Length + 1];
+
+        for (int i = 0; i < Subject.Length; i++)
+        {
+            newSubjects[i] = Subject[i];
+            newGrades[i] = Grades[i];
+        }
+
+        newSubjects[Subject.Length] = subject;
+        newGrades[Grades.Length] = grade;
+
+        Subject = newSubjects;
+        Grades = newGrades;
+    }
     public double CalculateAverage()
     {
         if (Grades.Length == 0) return 0;

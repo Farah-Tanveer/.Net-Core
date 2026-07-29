@@ -130,7 +130,21 @@ void AddStudent()
 }
 void DisplayAllStudents()
 {
-    string query = "SELECT * FROM Students";
+    string query = @"
+        SELECT
+            s.StudentId,
+            s.Name,
+            s.Class,
+            s.Section,
+            sub.SubjectName,
+            sg.Grade
+        FROM Students s
+        INNER JOIN StudentGrades sg
+            ON s.StudentId = sg.StudentId
+        INNER JOIN Subjects sub
+            ON sg.SubjectId = sub.SubjectId
+        ORDER BY s.StudentId, sub.SubjectId;
+    ";
 
     using SqlConnection connection = new SqlConnection(connectionString);
     using SqlCommand command = new SqlCommand(query, connection);
@@ -139,82 +153,204 @@ void DisplayAllStudents()
 
     using SqlDataReader reader = command.ExecuteReader();
 
+    Dictionary<int, Student> studentDictionary = new Dictionary<int, Student>();
+    
+    while (reader.Read())
+    {
+        int studentId = Convert.ToInt32(reader["StudentId"]);
+
+        if (!studentDictionary.ContainsKey(studentId))
+        {
+            studentDictionary[studentId] = new Student(
+                reader["Name"].ToString(),
+                reader["Class"].ToString(),
+                reader["Section"].ToString(),
+                new string[0],
+                new double[0]
+            );
+        }
+
+        Student student = studentDictionary[studentId];
+
+        // Add the subject and grade from this row
+        student.AddGrade(
+            reader["SubjectName"].ToString(),
+            Convert.ToDouble(reader["Grade"])
+        );
+    }
+
+    if (studentDictionary.Count == 0)
+    {
+        Console.WriteLine("No students found.");
+        return;
+    }
+
+    foreach (Student student in studentDictionary.Values)
+    {
+        student.DisplayInfo();
+    }
+}
+void SearchStudentByName()
+{
+    Console.Write("\nEnter name to search: ");
+    string searchName = Console.ReadLine();
+
+    string query = @"
+        SELECT
+            s.StudentId,
+            s.Name,
+            s.Class,
+            s.Section,
+            sub.SubjectName,
+            sg.Grade
+        FROM Students s
+        INNER JOIN StudentGrades sg
+            ON s.StudentId = sg.StudentId
+        INNER JOIN Subjects sub
+            ON sg.SubjectId = sub.SubjectId
+        WHERE s.Name LIKE @Name
+        ORDER BY s.StudentId, sub.SubjectId;
+    ";
+
+    using SqlConnection connection = new SqlConnection(connectionString);
+    using SqlCommand command = new SqlCommand(query, connection);
+
+    command.Parameters.AddWithValue("@Name", "%" + searchName + "%");
+
+    connection.Open();
+
+    using SqlDataReader reader = command.ExecuteReader();
+
+    Dictionary<int, Student> studentDictionary =
+        new Dictionary<int, Student>();
+
+    while (reader.Read())
+    {
+        int studentId = Convert.ToInt32(reader["StudentId"]);
+
+        if (!studentDictionary.ContainsKey(studentId))
+        {
+            studentDictionary[studentId] = new Student(
+                reader["Name"].ToString(),
+                reader["Class"].ToString(),
+                reader["Section"].ToString(),
+                new string[0],
+                new double[0]
+            );
+        }
+
+        Student student = studentDictionary[studentId];
+
+        student.AddGrade(
+            reader["SubjectName"].ToString(),
+            Convert.ToDouble(reader["Grade"])
+        );
+    }
+
+    if (studentDictionary.Count == 0)
+    {
+        Console.WriteLine("No student found.");
+        return;
+    }
+
+    foreach (Student student in studentDictionary.Values)
+    {
+        student.DisplayInfo();
+    }
+}
+void GenerateReport()
+{
+    Console.WriteLine("\n------------ GRADE REPORT -------------");
+
+    string query = @"
+        SELECT
+            s.StudentId,
+            s.Name,
+            AVG(sg.Grade) AS Average
+        FROM Students s
+        INNER JOIN StudentGrades sg
+            ON s.StudentId = sg.StudentId
+        GROUP BY
+            s.StudentId,
+            s.Name
+        ORDER BY s.StudentId;
+    ";
+
+    using SqlConnection connection =
+        new SqlConnection(connectionString);
+
+    using SqlCommand command =
+        new SqlCommand(query, connection);
+
+    connection.Open();
+
+    using SqlDataReader reader =
+        command.ExecuteReader();
+
     bool found = false;
+
+    int totalStudents = 0;
+    int passed = 0;
+    int failed = 0;
+
+    double classTotal = 0;
+
+    Console.WriteLine(
+        $"{"ID",-8}{"Name",-15}{"Average",-12}{"Grade",-10}{"Status"}"
+    );
+
+    Console.WriteLine(new string('-', 60));
 
     while (reader.Read())
     {
         found = true;
-        Console.WriteLine("\n-----------------------");
-        Console.WriteLine($"Student ID : {reader["StudentId"]}");
-        Console.WriteLine($"Name       :{reader["Name"]}");
-        Console.WriteLine($"Class      : {reader["Class"]}");
-        Console.WriteLine($"Section    : {reader["Section"]}");
+
+        int studentId = Convert.ToInt32(reader["StudentId"]);
+        string name = reader["Name"].ToString();
+        double average = Convert.ToDouble(reader["Average"]);
+
+        string grade;
+
+        if (average >= 90)
+            grade = "A";
+        else if (average >= 80)
+            grade = "B";
+        else if (average >= 70)
+            grade = "C";
+        else if (average >= 40)
+            grade = "D";
+        else
+            grade = "F";
+
+        string status = average >= 40 ? "PASS" : "FAIL";
+
+        Console.WriteLine(
+            $"{studentId,-8}{name,-15}{average,-12:F2}{grade,-10}{status}"
+        );
+
+        totalStudents++;
+
+        if (status == "PASS")
+            passed++;
+        else
+            failed++;
+
+        classTotal += average;
     }
 
     if (!found)
     {
         Console.WriteLine("No students found.");
-    }
-}
-
-
-void SearchStudentByName()
-{
-    Console.Write("\nEnter name to search: ");
-    string searchName = Console.ReadLine().ToLower();
-    bool found = false;
-
-    foreach (Student s in students)
-    {
-        if (s.Name.ToLower().Contains(searchName))
-        {
-            s.DisplayInfo();
-            found = true;
-        }
-    }
-
-    if (!found)
-        Console.WriteLine("No student found.");
-}
-
-void GenerateReport()
-{
-    Console.WriteLine("\n------------ GRADE REPORT -------------");
-
-    if (students.Count == 0)
-    {
-        Console.WriteLine("No students to report.");
         return;
     }
 
-    int passed = 0;
-    int failed = 0;
-    double classTotal = 0;
+    Console.WriteLine(new string('-', 60));
 
-    Console.WriteLine($"{"Roll#    "} {"Name       "} {"Average    "} {"Grade  "} {"Status "}");
-    Console.WriteLine(new string('-', 58));
-
-    foreach (Student s in students)
-    {
-        double avg = s.CalculateAverage();
-        string grade = s.GetLetterGrade();
-        string status = s.HasPassed() ? "PASS" : "FAIL";
-
-        if (s.HasPassed()) passed++;
-        else failed++;
-
-        classTotal += avg;
-
-        Console.WriteLine($"{s.Name}         {avg:F2}         {grade}       {status}");
-    }
-
-    Console.WriteLine(new string('-', 58));
-    Console.WriteLine($"Total Students : {students.Count}");
+    Console.WriteLine($"Total Students : {totalStudents}");
     Console.WriteLine($"Passed         : {passed}");
     Console.WriteLine($"Failed         : {failed}");
-    Console.WriteLine($"Class Average  : {classTotal / students.Count:F2}");
+    Console.WriteLine($"Class Average  : {classTotal / totalStudents:F2}");
 }
-
 double GetValidGrade(string subjectName)
 {
     double grade;
