@@ -1,0 +1,96 @@
+﻿@model StudentMVC.Models.Student
+
+@{
+    ViewData["Title"] = "Edit Student";
+}
+
+@Html.AntiForgeryToken()
+
+<h2>Edit Student</h2>
+
+<div id="alert-box" class="alert" style="display:none;"></div>
+
+<form id="editForm">
+    <input type="hidden" name="Id" id="Id" value="@Model.Id">
+    <div class="mb-3">
+        <label class="form-label">Name</label>
+        <input type="text" name="Name" id="Name" value="@Model.Name" class="form-control">
+        <span id="nameError" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" name="Email" id="Email" value="@Model.Email" class="form-control">
+        <span id="emailError" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Age</label>
+        <input type="number" name="Age" id="Age" value="@Model.Age" class="form-control">
+        <span id="ageError" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-success">Save Changes</button>
+    <a href="/Student/Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+<script>
+    $.ajaxSetup({
+        headers: {
+            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+        }
+    });
+
+    $('#editForm').on('submit', function (e) {
+        e.preventDefault();
+
+        // Clear previous errors
+        $('#nameError').text('');
+        $('#emailError').text('');
+        $('#ageError').text('');
+        $('#alert-box').hide();
+
+        $.ajax({
+            url: '/Student/Edit',
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    showSuccess(response.message);
+                    setTimeout(function () {
+                        window.location.href = '/Student/Index';
+                    }, 1500);
+                } else {
+                    if (response.errors) {
+                        if (response.errors.Name)
+                            $('#nameError').text(response.errors.Name);
+                        if (response.errors.Email)
+                            $('#emailError').text(response.errors.Email);
+                        if (response.errors.Age)
+                            $('#ageError').text(response.errors.Age);
+                    } else {
+                        showError(response.message);
+                    }
+                }
+            },
+            error: function () {
+                showError('Something went wrong. Please try again.');
+            }
+        });
+    });
+
+    function showSuccess(message) {
+        $('#alert-box')
+            .removeClass('alert-danger')
+            .addClass('alert-success')
+            .text(message)
+            .show();
+    }
+
+    function showError(message) {
+        $('#alert-box')
+            .removeClass('alert-success')
+            .addClass('alert-danger')
+            .text(message)
+            .show();
+    }
+</script>
+}
