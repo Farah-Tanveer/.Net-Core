@@ -14,7 +14,7 @@ namespace RoleBasedAuth.Controllers
             _userManager = userManager;
         }
 
-        // Dashboard — shows all users
+
         public async Task<IActionResult> Index()
         {
             try
@@ -29,13 +29,12 @@ namespace RoleBasedAuth.Controllers
             }
         }
 
-        // GET — Add new user form
         public IActionResult AddUser()
         {
             return View();
         }
 
-        // POST — Save new user
+      
         [HttpPost]
         public async Task<IActionResult> AddUser(string email, string password, string role)
         {
@@ -58,7 +57,6 @@ namespace RoleBasedAuth.Controllers
             return View();
         }
 
-        // Delete user
         public async Task<IActionResult> DeleteUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);

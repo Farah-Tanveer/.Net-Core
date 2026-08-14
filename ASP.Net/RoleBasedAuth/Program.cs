@@ -5,11 +5,13 @@ using RoleBasedAuth.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        sqlOptions => sqlOptions.CommandTimeout(60)
+        sqlOptions => {
+            sqlOptions.CommandTimeout(60);
+            sqlOptions.EnableRetryOnFailure(3);
+        }
     ));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -47,8 +49,7 @@ app.MapControllerRoute(
 
 app.MapRazorPages()
    .WithStaticAssets();
-// Seed roles
-// Seed roles
+
 using (var scope = app.Services.CreateScope())
 {
     try

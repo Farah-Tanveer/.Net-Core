@@ -16,7 +16,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RoleBasedAuth")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4786778f8ac24257742d0b451c7e5ec1a3f97bee")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+30066219d0bccb96b53e8024bea631c622cc6dcc")]
 [assembly: System.Reflection.AssemblyProductAttribute("RoleBasedAuth")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RoleBasedAuth")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
